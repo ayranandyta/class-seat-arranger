@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Let's arrange your class' seat!</title>
+    <style>
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        /* Palette Earth Tone:
+           Background: #F5F2EB (Warm Cream)
+           Panel: #EFECE6
+           Text: #2D3A2F (Deep Forest Green)
+           Primary Accent: #6B8E23 / #556B2F (Olive / Sage Green)
+           Secondary Accent: #C86D51 (Terracotta)
+           Board: #3B4A3E (Dark Moss Green)
+        */
+        body { 
+            background-color: #F5F2EB; 
+            color: #2D3A2F; 
+            padding: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        h1 { 
+            margin-bottom: 25px; 
+            font-size: 28px; 
+            color: #3B4A3E; 
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .container { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 1100px; 
+        }
+
+        .panel { 
+            background: #EFECE6; 
+            padding: 22px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
+            border: 1px solid #E2DDD5;
+        }
+
+        .input-panel { flex: 1; min-width: 320px; }
+        .display-panel { flex: 2; min-width: 380px; display: flex; flex-direction: column; align-items: center; }
+        
+        .section-title { 
+            font-size: 15px; 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            color: #556B2F; 
+            border-bottom: 2px solid #D8D2C6; 
+            padding-bottom: 6px; 
+        }
+
+        .config-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .config-group label { font-size: 13px; font-weight: 600; flex: 1; color: #4A574C; }
+        .config-group input { 
+            width: 100%; 
+            padding: 9px; 
+            margin-top: 5px; 
+            border: 1px solid #C8C2B5; 
+            border-radius: 6px; 
+            background: #FAFAFA;
+            color: #2D3A2F;
+        }
+        
+        textarea { 
+            width: 100%; 
+            height: 140px; 
+            padding: 10px; 
+            margin: 8px 0 15px 0; 
+            border: 1px solid #C8C2B5; 
+            border-radius: 6px; 
+            font-size: 13px; 
+            background: #FAFAFA;
+            color: #2D3A2F;
+            resize: vertical;
+        }
+        
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-bottom: 10px; 
+            font-size: 14px; 
+            transition: all 0.2s ease; 
+        }
+
+        .btn-green { 
+            background: #556B2F; 
+            color: #F5F2EB; 
+        }
+        .btn-green:hover { background: #435525; }
+
+        .btn-earth { 
+            background: #8B7355; 
+            color: #F5F2EB; 
+        }
+        .btn-earth:hover { background: #6F5B42; }
+
+        .blackboard { 
+            width: 85%; 
+            background: #3B4A3E; 
+            color: #F5F2EB; 
+            text-align: center; 
+            padding: 12px; 
+            font-weight: 700; 
+            border-radius: 6px; 
+            margin-bottom: 20px; 
+            letter-spacing: 2px; 
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+        }
+        
+        .word-table-grid { 
+            display: grid; 
+            gap: 8px; 
+            width: 100%; 
+            margin-bottom: 15px; 
+        }
+
+        .table-cell {
+            min-height: 52px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 700;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+            cursor: pointer; 
+            user-select: none; 
+            padding: 6px; 
+            transition: all 0.15s ease;
+            word-break: break-word;
+        }
+        
+        /* Tipe Cell Earth Tone */
+        .table-cell.seat { 
+            background: #FDFBF7; 
+            border: 2px solid #8B7355; 
+            color: #2D3A2F; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
+        }
+        .table-cell.empty { 
+            background: #E5E0D8; 
+            border: 1px dashed #B8B0A2; 
+            color: #9C9385; 
+        }
+        
+        .instruction { 
+            font-size: 12px; 
+            color: #5C5245; 
+            background: #E6E1D7; 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-bottom: 18px; 
+            line-height: 1.5; 
+            width: 100%; 
+            border-left: 4px solid #C86D51;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Let's arrange your class' seat!</h1>
+
+    <div class="container">
+        <!-- Panel Input -->
+        <div class="panel input-panel">
+            
+            <div class="section-title">1. Buat Ukuran Tabel</div>
+            <div class="config-group">
+                <label>Jumlah Baris: <input type="number" id="rowsInput" value="4" min="1" max="10"></label>
+                <label>Jumlah Kolom: <input type="number" id="colsInput" value="8" min="1" max="10"></label>
+            </div>
+            <button class="btn-earth" onclick="generateWordTable()">Generate / Reset Tabel</button>
+
+            <br>
+            <div class="section-title">2. Input Nama Siswa/i</div>
+            <textarea id="studentNames" placeholder="Ketik nama siswa, pisahkan dengan koma..."></textarea>
+
+            <button class="btn-green" onclick="randomizeSeats()">ACAK SISWA KE TABEL</button>
+        </div>
+
+        <!-- Panel Tampilan Tabel -->
+        <div class="display-panel panel">
+            <div class="blackboard">PAPAN TULIS / DEPAN KELAS</div>
+
+            <div class="instruction">
+                💡 <b>Cara Kustomisasi Layout Tabel:</b><br>
+                • Klik kotak mana saja untuk mengubah statusnya: <b>[ Ada Meja ]</b> atau <b>[ Kosong / Jalanan ]</b>.<br>
+                • Sesuaikan layout tabel ini sesuka hati sebelum menekan tombol acak.
+            </div>
+
+            <div id="tableContainer" class="word-table-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let tableData = [];
+
+        function generateWordTable() {
+            const rows = parseInt(document.getElementById('rowsInput').value);
+            const cols = parseInt(document.getElementById('colsInput').value);
+            const container = document.getElementById('tableContainer');
+
+            container.innerHTML = '';
+            container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            tableData = [];
+
+            for (let r = 0; r < rows; r++) {
+                tableData[r] = [];
+                for (let c = 0; c < cols; c++) {
+                    tableData[r][c] = { isSeat: true, student: '' };
+
+                    const cell = document.createElement('div');
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.onclick = () => toggleCell(r, c);
+
+                    container.appendChild(cell);
+                }
+            }
+            renderTable();
+        }
+
+        function toggleCell(r, c) {
+            tableData[r][c].isSeat = !tableData[r][c].isSeat;
+            tableData[r][c].student = ''; 
+            renderTable();
+        }
+
+        function renderTable() {
+            const rows = tableData.length;
+            const cols = tableData[0].length;
+            const container = document.getElementById('tableContainer');
+            let cells = container.children;
+            let index = 0;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cell = cells[index];
+                    const data = tableData[r][c];
+
+                    if (data.isSeat) {
+                        cell.className = 'table-cell seat';
+                        cell.innerText = data.student ? data.student : '[ Meja ]';
+                    } else {
+                        cell.className = 'table-cell empty';
+                        cell.innerText = 'x';
+                    }
+                    index++;
+                }
+            }
+        }
+
+        function randomizeSeats() {
+            const rawNames = document.getElementById('studentNames').value;
+            let students = rawNames.split(',')
+                                  .map(n => n.trim())
+                                  .filter(n => n.length > 0);
+
+            // Fisher-Yates Shuffle
+            for (let i = students.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [students[i], students[j]] = [students[j], students[i]];
+            }
+
+            let studentIdx = 0;
+            for (let r = 0; r < tableData.length; r++) {
+                for (let c = 0; c < tableData[0].length; c++) {
+                    if (tableData[r][c].isSeat) {
+                        if (studentIdx < students.length) {
+                            tableData[r][c].student = students[studentIdx];
+                            studentIdx++;
+                        } else {
+                            tableData[r][c].student = '- Kosong -';
+                        }
+                    }
+                }
+            }
+            renderTable();
+        }
+
+        // Default Data
+        document.getElementById('studentNames').value = "Budi, Siti, Agus, Dewi, Rian, Bintang, Maya, Reza, Farhan, Nina, Joko, Lisa";
+        generateWordTable();
+    </script>
+</body>
+</html>
